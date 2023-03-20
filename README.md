@@ -15,3 +15,7 @@ C++ Updated version of SimpleGameEngine.
 # Cons:
 
 - You can only compile x86
+
+# Credits:
+
+- SDL2: [libsdl.org](https://libsdl.org/)
