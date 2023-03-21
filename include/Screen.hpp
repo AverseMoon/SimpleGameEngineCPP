@@ -18,7 +18,7 @@ using namespace SGE_GRAPHICS;
 
 namespace SGE_GRAPHICS {
 	class Window;
-	typedef int (*draw_function_type)(list<SDL_Event> events, Window* window, float delta);
+	typedef int (*draw_function_type)(list<SDL_Event> events, Window* window);
 
 	class Window {
 	public:
@@ -28,9 +28,7 @@ namespace SGE_GRAPHICS {
 		list <draw_function_type> drawFunctions;
 		Renderer spriteRenderer = Renderer();
 		SDL_Renderer* renderer = NULL;
-		int SCREEN_WIDTH;
-		int SCREEN_HEIGHT;
-		float fps;
+		Uint64 tick = 0;
 
 		void AddChild(NODETYPE node) { spriteRenderer.root.addChild(node); }
 		void AddDrawFunction(draw_function_type function) { drawFunctions.push_back(function); }
@@ -39,12 +37,8 @@ namespace SGE_GRAPHICS {
 		void setIcon(const char* file) { SDL_SetWindowIcon(window, SDL_loadMedia(file)); }
 		int Run() {
 			bool quit = false;
-			int iter;
-			int stime;
-			float delta;
-			int timepassed;
+			tick = 0;
 			while (!quit) {
-				stime = SDL_GetTicks();
 				SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 				SDL_RenderClear(renderer);
 				list<SDL_Event> events;
@@ -60,21 +54,18 @@ namespace SGE_GRAPHICS {
 					}
 				}
 				for (draw_function_type func : drawFunctions) {
-					if (func(events, this, delta)) {
+					if (func(events, this)) {
 						quit = true;
 					}
 				}
 				spriteRenderer.render(renderer);
-				SDL_RenderPresent(renderer);
-				timepassed = SDL_GetTicks() - stime;
-				delta = timepassed / (1000 / fps);
+				tick++;
 			}
 			return 0;
 		}
-		Window(Vec2 pos = Vec2(), Vec2 size = Vec2(500, 500), const char* title = "Simple Game", const char* icon = "icon.bmp", Uint32 initFlags = SDL_INIT_EVERYTHING, Uint32 windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN, float fps = 60) {
+		Window(Vec2 pos = Vec2(), Vec2 size = Vec2(500, 500), const char* title = "Simple Game", const char* icon = "icon.bmp", Uint32 initFlags = SDL_INIT_EVERYTHING, Uint32 windowFlags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN) {
 			WindowSize = Vec2i(size);
 			WindowPos = Vec2i(pos);
-			this->fps = fps;
 			window = SDL_CreateWindow(title, WindowPos.x, WindowPos.y, WindowSize.x, WindowSize.y, windowFlags);
 			if (window == NULL) {
 				cout << "Window could not be created, ERROR: " << SDL_GetError() << "\n";
