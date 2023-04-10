@@ -1,6 +1,6 @@
 # SimpleGameEngineC++
 
-C++ Updated version of SimpleGameEngine.
+C++ Updated version of [SimpleGameEngine](https://github.com/AverseMoon/SimpleGameEngine).
 
 # Features
 
